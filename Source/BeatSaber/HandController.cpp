@@ -97,24 +97,32 @@ void AHandController::SlicingTheBeat()
 	case EMovementDirection::EMD_Left:
 		HapticFeedback();
 		Beat->OnBeatOverlap(FVector(0, 0, 1), FVector(500, -500, 0));
-		Beat->StopMovement(true);
+		Beat->CheckValidHit(EMovementDirection::EMD_Left, GetHand());
+		//Beat->StopMovement(true);
 		break;
 	case EMovementDirection::EMD_Right:
 		HapticFeedback();
 		Beat->OnBeatOverlap(FVector(0, 0, 1), FVector(500, 500, 0));
-		Beat->StopMovement(true);
+		Beat->CheckValidHit(EMovementDirection::EMD_Right, GetHand());
+		//Beat->StopMovement(true);
 		break;
 	case EMovementDirection::EMD_Up:
 		HapticFeedback();
 		Beat->OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, -500));
-		Beat->StopMovement(true);
+		Beat->CheckValidHit(EMovementDirection::EMD_Up, GetHand());
+		//Beat->StopMovement(true);
 		break;
 	case EMovementDirection::EMD_Down:
 		HapticFeedback();
 		Beat->OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, 500));
-		Beat->StopMovement(true);
+		Beat->CheckValidHit(EMovementDirection::EMD_Down, GetHand());
+		//Beat->StopMovement(true);
 		break;
 	}
+	/*if (CheckValidHit(MovementDirection))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Valid Hit"))
+	}*/
 }
 
 void AHandController::HapticFeedback()
@@ -130,6 +138,20 @@ void AHandController::HapticFeedback()
 			false
 		);
 	}
+}
+
+EHand AHandController::GetHand()
+{
+	switch (MotionController->GetTrackingSource())
+	{
+	case EControllerHand::Left:
+		return EHand::ECH_Left;
+		break;
+	case EControllerHand::Right:
+		return EHand::ECH_Right;
+		break;
+	}
+	return EHand::ECH_Right;
 }
 
 void AHandController::ActorBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)

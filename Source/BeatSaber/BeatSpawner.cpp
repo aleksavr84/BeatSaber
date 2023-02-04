@@ -55,7 +55,7 @@ void ABeatSpawner::SpawnBeat()
                 GetActorRotation(),
                 SpawnParams
                 );
-            Beat->SetBeatSide(EBeatSide::EBS_Left);
+            Beat->SetBeatSpawnSide(EBeatSpawnSide::EBS_Left);
         }
         
         GenerateBeat();

@@ -3,19 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MotionControllerComponent.h"
+#include "Types.h"
 #include "HandController.generated.h"
-
-UENUM(BlueprintType)
-enum class EMovementDirection : uint8
-{
-	EMD_Stopped UMETA(DisplayName = "Stopped"),
-	EMD_Left UMETA(DisplayName = "Left"),
-	EMD_Right UMETA(DisplayName = "Right"),
-	EMD_Up UMETA(DisplayName = "Up"),
-	EMD_Down UMETA(DisplayName = "Down"),
-
-	EMD_MAX UMETA(DisplayName = "DefalutMAX")
-};
 
 UCLASS()
 class BEATSABER_API AHandController : public AActor
@@ -63,6 +52,7 @@ private:
 	void CalculateMovementDirection();
 	void SlicingTheBeat();
 	void HapticFeedback();
+	EHand GetHand();
 	
 	// Calculate Direction
 	FVector StartLocation;
@@ -74,4 +64,5 @@ private:
 
 public:
 	void SetHand(EControllerHand Hand) { MotionController->SetTrackingSource(Hand); }
+	
 };

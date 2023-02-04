@@ -2,16 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Types.h"
 #include "Beat.generated.h"
-
-UENUM(BlueprintType)
-enum class EBeatSide : uint8
-{
-	EBS_Left UMETA(DisplayName = "Left"),
-	EBS_Right UMETA(DisplayName = "Right"),
-
-	EMD_MAX UMETA(DisplayName = "DefalutMAX")
-};
 
 UCLASS()
 class BEATSABER_API ABeat : public AActor
@@ -23,6 +15,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnBeatOverlap(FVector HitDirection, FVector Impulse);
+	void CheckValidHit(EMovementDirection Direction, EHand Hand);
 
 protected:
 	virtual void BeginPlay() override;
@@ -44,20 +37,26 @@ private:
 	UMaterial* RightBeatMaterial;
 
 	UPROPERTY(EditAnywhere);
-	EBeatSide BeatSide = EBeatSide::EBS_Right;
+	EBeatSpawnSide BeatSide = EBeatSpawnSide::EBS_Right;
+
+	UPROPERTY(EditAnywhere);
+	EBeatDirection BeatDirection = EBeatDirection::EBD_Right;
 
 	void Init();
 	bool bIsInitialized;
 	bool bStopMovement = false;
 	void SetBeatMaterial();
 	void Move();
+	void Rotate();
 
 	UPROPERTY(EditDefaultsOnly)
 	double MovementSpeed = 3;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	FORCEINLINE void SetBeatSide(EBeatSide Side) { BeatSide = Side; }
+	FORCEINLINE void SetBeatSpawnSide(EBeatSpawnSide Side) { BeatSide = Side; }
+	FORCEINLINE EBeatSpawnSide GetBeatSpawnSide() { return BeatSide; }
+	FORCEINLINE void SetBeatDirection(EBeatDirection Direction) { BeatDirection = Direction; }
+	FORCEINLINE EBeatDirection GetBeatDirection() { return BeatDirection; }
 	FORCEINLINE void StopMovement(bool bStop) { bStopMovement = bStop; }
-
 };

@@ -3,87 +3,86 @@
 
 ABeat::ABeat()
 {
- //	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 
-	//ProcedualMesh = CreateDefaultSubobject<UProceduralMeshComponent>(FName("ProcedualMesh"));
-	//SetRootComponent(ProcedualMesh);
+	BeatMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("BeatMesh"));
+	BeatMesh->SetupAttachment(GetRootComponent());
+	BeatMesh->SetVisibility(false);
 
-	//ProcedualMesh->bUseAsyncCooking = true;
-	////ProcedualMesh->bUseComplexAsSimpleCollision(false);
+	ProcedualMesh = CreateDefaultSubobject<UProceduralMeshComponent>(FName("ProcedualMesh"));
+	ProcedualMesh->SetupAttachment(BeatMesh);
+	ProcedualMesh->bUseAsyncCooking = true;
 
-	//BeatMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("BeatMesh"));
-	//BeatMesh->SetupAttachment(ProcedualMesh);
-	//BeatMesh->SetVisibility(false);
-}
+	HitSideMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName("HitSideMesh"));
+	HitSideMesh->SetupAttachment(ProcedualMesh);
 
-// This is called when actor is spawned (at runtime or when you drop it into the world in editor)
-void ABeat::PostActorCreated()
-{
-	Super::PostActorCreated();
-	/*CreateCube();*/
+	if (LeftBeatMaterial)
+	{
+		LeftBeatMaterial = CreateDefaultSubobject<UMaterial>(TEXT("LeftBeatMaterial"));
+	}
+	if (RightBeatMaterial)
+	{
+		RightBeatMaterial = CreateDefaultSubobject<UMaterial>(TEXT("RightBeatMaterial"));
+	}
 }
 
 void ABeat::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-// This is called when actor is already in level and map is opened
-void ABeat::PostLoad()
-{
-	Super::PostLoad();
-	/*CreateCube();*/
-}
-
-void ABeat::CreateCube()
-{
-	//TArray<FVector> vertices;
-	//vertices.Add(FVector(0, 0, 0));
-	//vertices.Add(FVector(0, 100, 0));
-	//vertices.Add(FVector(0, 100, 100));
-	//vertices.Add(FVector(0, 0, 100));
-
-	//TArray<int32> Triangles;
-	//Triangles.Add(0);
-	//Triangles.Add(1);
-	//Triangles.Add(2);
-	//Triangles.Add(3);
-
-	//TArray<FVector> normals;
-	//normals.Add(FVector(1, 0, 0));
-	//normals.Add(FVector(1, 0, 0));
-	//normals.Add(FVector(1, 0, 0));
-	//normals.Add(FVector(1, 0, 0));
-
-	//TArray<FVector2D> UV0;
-	//UV0.Add(FVector2D(0, 0));
-	//UV0.Add(FVector2D(10, 0));
-	//UV0.Add(FVector2D(10, 10));
-	//UV0.Add(FVector2D(0, 10));
-
-
-	//TArray<FProcMeshTangent> tangents;
-	//tangents.Add(FProcMeshTangent(0, 1, 0));
-	//tangents.Add(FProcMeshTangent(0, 1, 0));
-	//tangents.Add(FProcMeshTangent(0, 1, 0));
-	//tangents.Add(FProcMeshTangent(0, 1, 0));
-
-	//TArray<FLinearColor> vertexColors;
-	//vertexColors.Add(FLinearColor(0.75, 0.75, 0.75, 1.0));
-	//vertexColors.Add(FLinearColor(0.75, 0.75, 0.75, 1.0));
-	//vertexColors.Add(FLinearColor(0.75, 0.75, 0.75, 1.0));
-	//vertexColors.Add(FLinearColor(0.75, 0.75, 0.75, 1.0));
-
-	//ProcedualMesh->CreateMeshSection_LinearColor(0, vertices, Triangles, normals, UV0, vertexColors, tangents, true);
-
-	//// Enable collision data
-	//ProcedualMesh->ContainsPhysicsTriMeshData(true);
+	SetBeatMaterial();
 }
 
 void ABeat::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
+	if (!bIsInitialized)
+	{
+		Init();
+	}
+	
+	if (!bStopMovement)
+	{
+		Move();
+	}	
 }
 
+void ABeat::Init()
+{
+	bIsInitialized = true;
+	SetBeatMaterial();
+}
+
+void ABeat::SetBeatMaterial()
+{
+	switch (BeatSide)
+	{
+	case EBeatSide::EBS_Left:
+		if (LeftBeatMaterial)
+		{
+			HitSideMesh->SetMaterial(0, LeftBeatMaterial);
+		}
+		break;
+	case EBeatSide::EBS_Right:
+		if (RightBeatMaterial)
+		{
+			HitSideMesh->SetMaterial(0, RightBeatMaterial);
+		}
+		break;
+	}
+}
+
+void ABeat::Move()
+{
+	FTransform DeltaTransform;
+	DeltaTransform.SetLocation(FVector(MovementSpeed * -1, 0, 0));
+	DeltaTransform.SetScale3D(GetActorScale3D());
+
+	AddActorWorldTransform(DeltaTransform);
+}
+
+void ABeat::OnBeatOverlap_Implementation(FVector HitDirection, FVector Impulse)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Doing some work here"));
+}

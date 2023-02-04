@@ -22,20 +22,26 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere)
+	class USceneComponent* VRRoot;
+	
+	UPROPERTY(VisibleAnywhere)
 	class UCameraComponent* Camera;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AHandController> HandControllerClass;
+
+	UPROPERTY(EditAnywhere)
+	float ControllerRotation = 0.f;
+
 	UPROPERTY()
-	class AHandController* LeftController;
+	AHandController* LeftController;
+
+	UPROPERTY(EditDefaultsOnly)
+	UMaterial* LeftSaberMaterial;
 
 	UPROPERTY()
 	AHandController* RightController;
 
-	UPROPERTY(VisibleAnywhere)
-	class USceneComponent* VRRoot;
-
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<AHandController> HandControllerClass;
-
-	UPROPERTY(EditAnywhere)
-	float ControllerRotation = 0.f;
+	UMaterial* RightSaberMaterial;
 };

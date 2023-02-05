@@ -1,4 +1,5 @@
 #include "Beat.h"
+#include "TimerManager.h"
 #include "ProceduralMeshComponent.h"
 
 ABeat::ABeat()
@@ -31,6 +32,7 @@ void ABeat::BeginPlay()
 	Super::BeginPlay();
 	
 	SetBeatMaterial();
+	StartTimer();
 }
 
 void ABeat::Tick(float DeltaTime)
@@ -42,6 +44,13 @@ void ABeat::Tick(float DeltaTime)
 		Init();
 	}
 	
+	if (bIsInitialized && 
+		!bIsRotated &&
+		bStartRotation)
+	{
+		Rotate(DeltaTime);
+	}
+
 	if (!bStopMovement)
 	{
 		Move();
@@ -50,9 +59,96 @@ void ABeat::Tick(float DeltaTime)
 
 void ABeat::Init()
 {
-	bIsInitialized = true;
+	SetBeatSide();
 	SetBeatMaterial();
+	GenerateRandomRotation();
+
+	bIsInitialized = true;
 }
+
+void ABeat::StartTimer()
+{
+	FTimerHandle Handle;
+	
+	GetWorldTimerManager().SetTimer(
+		Handle,
+		this,
+		&ABeat::StartRotation,
+		FMath::RandRange(2, 5)
+	);
+}
+
+void ABeat::SetBeatSide()
+{
+	FVector BeatLocation = GetActorLocation();
+
+	if (BeatLocation.Y >= 0)
+	{
+		if (!bIsInverted)
+		{
+			BeatSide = EBeatSpawnSide::EBS_Right;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Inverted Right -> Left"))
+			BeatSide = EBeatSpawnSide::EBS_Left;
+		}	
+	} 
+	else if (BeatLocation.Y < 0)
+	{
+		if (!bIsInverted)
+		{
+			BeatSide = EBeatSpawnSide::EBS_Left;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Inverted Left -> Right"))
+			BeatSide = EBeatSpawnSide::EBS_Right;
+		}
+	}
+}
+
+void ABeat::GenerateRandomRotation()
+{
+	switch (FMath::RandRange(0, 3))
+	{
+		// Right
+	case 0:
+		BeatRotation = FRotator(0, 0, 0);
+		break;
+		// Up
+	case 1:
+		BeatRotation = FRotator(0, 0, -90);
+		break;
+		// Left
+	case 2:
+		BeatRotation = FRotator(0, 0, -180);
+		break;
+		// Down
+	case 3:
+		BeatRotation = FRotator(0, 0, -270);
+		break;
+	}
+}
+
+void ABeat::StartRotation()
+{
+	bStartRotation = true;
+}
+
+void ABeat::Rotate(float DeltaTime)
+{
+	if (!FMath::IsNearlyEqual(GetActorRotation().Roll, BeatRotation.Roll, 0.5))
+	{
+		FRotator RotationValue = FMath::RInterpTo(GetActorRotation(), BeatRotation, DeltaTime, 5.f);
+
+		SetActorRotation(FQuat(RotationValue));
+	}
+	else
+	{
+		bIsRotated = true;
+	}
+	}
 
 void ABeat::SetBeatMaterial()
 {
@@ -82,11 +178,6 @@ void ABeat::Move()
 	AddActorWorldTransform(DeltaTransform);
 }
 
-void ABeat::Rotate()
-{
-
-}
-
 void ABeat::OnBeatOverlap_Implementation(FVector HitDirection, FVector Impulse)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Doing some work here"));
@@ -94,21 +185,38 @@ void ABeat::OnBeatOverlap_Implementation(FVector HitDirection, FVector Impulse)
 
 void ABeat::CheckValidHit(EMovementDirection Direction, EHand Hand)
 {
-	if ((GetBeatDirection() == EBeatDirection::EBD_Right &&
+	if ((BeatDirection == EBeatDirection::EBD_Right &&
 		Direction == EMovementDirection::EMD_Left
-		|| GetBeatDirection() == EBeatDirection::EBD_Left &&
+		|| BeatDirection == EBeatDirection::EBD_Left &&
 		Direction == EMovementDirection::EMD_Right
-		|| GetBeatDirection() == EBeatDirection::EBD_Down &&
+		|| BeatDirection == EBeatDirection::EBD_Down &&
 		Direction == EMovementDirection::EMD_Up
-		|| GetBeatDirection() == EBeatDirection::EBD_Top &&
+		|| BeatDirection == EBeatDirection::EBD_Top &&
 		Direction == EMovementDirection::EMD_Down) &&
-		(GetBeatSpawnSide() == EBeatSpawnSide::EBS_Left &&
+		(BeatSide == EBeatSpawnSide::EBS_Left &&
 			Hand == EHand::ECH_Left)
-		|| (GetBeatSpawnSide() == EBeatSpawnSide::EBS_Right &&
+		|| (BeatSide == EBeatSpawnSide::EBS_Right &&
 			Hand == EHand::ECH_Right))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Valid Hit"));
+		// Valid Hit
+		switch (Direction)
+		{
+		case EMovementDirection::EMD_Left:
+			OnBeatOverlap(FVector(0, 0, 1), FVector(500, -500, 0));
+			break;
+		case EMovementDirection::EMD_Right:
+			OnBeatOverlap(FVector(0, 0, 1), FVector(500, 500, 0));
+			break;
+		case EMovementDirection::EMD_Up:
+			OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, -500));
+			break;
+		case EMovementDirection::EMD_Down:
+			OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, 500));
+			break;
+		}
+		bStopMovement = true;
 	}
+	// Invalid Hit
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid Hit"));

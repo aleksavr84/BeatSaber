@@ -54,7 +54,7 @@ void AHandController::CalculateMovementDirection()
 	FVector MovementDelta = UKismetMathLibrary::GetDirectionUnitVector(StartLocation, GetActorLocation());
 
 	MovementDelta.Normalize();
-	UE_LOG(LogTemp, Warning, TEXT("Calculate"));
+	
 	// Right to Left
 	if ((MovementDelta.Y < 0 && UKismetMathLibrary::Abs(MovementDelta.Y) >= MinOffsetY) 
 		&& (UKismetMathLibrary::Abs(MovementDelta.Z) < MinOffsetZ))
@@ -96,33 +96,21 @@ void AHandController::SlicingTheBeat()
 	{
 	case EMovementDirection::EMD_Left:
 		HapticFeedback();
-		Beat->OnBeatOverlap(FVector(0, 0, 1), FVector(500, -500, 0));
 		Beat->CheckValidHit(EMovementDirection::EMD_Left, GetHand());
-		//Beat->StopMovement(true);
 		break;
 	case EMovementDirection::EMD_Right:
 		HapticFeedback();
-		Beat->OnBeatOverlap(FVector(0, 0, 1), FVector(500, 500, 0));
 		Beat->CheckValidHit(EMovementDirection::EMD_Right, GetHand());
-		//Beat->StopMovement(true);
 		break;
 	case EMovementDirection::EMD_Up:
 		HapticFeedback();
-		Beat->OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, -500));
 		Beat->CheckValidHit(EMovementDirection::EMD_Up, GetHand());
-		//Beat->StopMovement(true);
 		break;
 	case EMovementDirection::EMD_Down:
 		HapticFeedback();
-		Beat->OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, 500));
 		Beat->CheckValidHit(EMovementDirection::EMD_Down, GetHand());
-		//Beat->StopMovement(true);
 		break;
 	}
-	/*if (CheckValidHit(MovementDirection))
-	{
-		UE_LOG(LogTemp, Error, TEXT("Valid Hit"))
-	}*/
 }
 
 void AHandController::HapticFeedback()

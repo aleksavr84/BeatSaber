@@ -1,5 +1,6 @@
 #include "BeatSpawner.h"
 #include "TimerManager.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Beat.h"
 
 ABeatSpawner::ABeatSpawner()
@@ -11,6 +12,7 @@ ABeatSpawner::ABeatSpawner()
 void ABeatSpawner::BeginPlay()
 {
 	Super::BeginPlay();
+ 
     GenerateBeat();
 }
 
@@ -30,15 +32,46 @@ void ABeatSpawner::GenerateBeat()
         GetWorldTimerManager().SetTimer(
             Handle,
             this,
-            &ABeatSpawner::SpawnBeat,
+            &ABeatSpawner::GenerateRandomSide,
             BeatTime
         );
     }
 }
 
-void ABeatSpawner::SpawnBeat()
+void ABeatSpawner::GenerateRandomSide()
 {
-    if (BeatClass && !bIsBeat)
+    bIsDoubleBeat = UKismetMathLibrary::RandomBool();
+    bIsInvertedBeat = UKismetMathLibrary::RandomBool();
+
+    if (bIsDoubleBeat)
+    {
+        // Spawning a double beat
+        // Right
+        SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y + SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+        // Left
+        SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y - SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+    }
+    else
+    {
+        // Spawning a single beat on Random Side
+        if (UKismetMathLibrary::RandomBool())
+        {
+            // Right
+            SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y + SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+        }
+        else
+        {
+            // Left
+            SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y - SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+        }
+    }
+  
+    GenerateBeat();
+}
+
+void ABeatSpawner::SpawnBeat(FVector Location, bool bInvert)
+{
+    if (BeatClass && (!bIsBeat || bIsDoubleBeat))
     {
         bIsBeat = true;
 
@@ -51,14 +84,12 @@ void ABeatSpawner::SpawnBeat()
         {
             ABeat* Beat = World->SpawnActor<ABeat>(
                 BeatClass,
-                GetActorLocation(),
+                Location,
                 GetActorRotation(),
                 SpawnParams
                 );
-            Beat->SetBeatSpawnSide(EBeatSpawnSide::EBS_Left);
+            Beat->SetInverted(bInvert);   
         }
-        
-        GenerateBeat();
     }
 }
 

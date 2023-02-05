@@ -28,7 +28,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 TotalBeatsToSpawn = 30;
 
+	UPROPERTY(EditAnywhere)
+	double SpawnOffset = 100;
+
 	void GenerateBeat();
-	void SpawnBeat();
+	void GenerateRandomSide();
+	void SpawnBeat(FVector Location, bool bInvert);
+	FVector BeatSpawnLocation;
 	bool bIsBeat;
+	bool bIsDoubleBeat;
+	bool bIsInvertedBeat;
 };

@@ -12,13 +12,13 @@ class BEATSABER_API ABeat : public AActor
 	
 public:	
 	ABeat();
-
-	UFUNCTION(BlueprintNativeEvent)
-	void OnBeatOverlap(FVector HitDirection, FVector Impulse);
 	void CheckValidHit(EMovementDirection Direction, EHand Hand);
 
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnBeatOverlap(FVector HitDirection, FVector Impulse);
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -44,19 +44,29 @@ private:
 
 	void Init();
 	bool bIsInitialized;
+	bool bIsInverted;
+	bool bStartRotation;
+	bool bIsRotated;
 	bool bStopMovement = false;
+	FRotator BeatRotation = FRotator(0, 0, 0);
+
 	void SetBeatMaterial();
 	void Move();
-	void Rotate();
+	void SetBeatSide();
+	void GenerateRandomRotation();
+	void StartTimer();
+	void StartRotation();
+	void Rotate(float DeltaTime);
 
 	UPROPERTY(EditDefaultsOnly)
 	double MovementSpeed = 3;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	FORCEINLINE void SetBeatSpawnSide(EBeatSpawnSide Side) { BeatSide = Side; }
-	FORCEINLINE EBeatSpawnSide GetBeatSpawnSide() { return BeatSide; }
-	FORCEINLINE void SetBeatDirection(EBeatDirection Direction) { BeatDirection = Direction; }
-	FORCEINLINE EBeatDirection GetBeatDirection() { return BeatDirection; }
-	FORCEINLINE void StopMovement(bool bStop) { bStopMovement = bStop; }
+	FORCEINLINE void SetInverted(bool bInvert) { bIsInverted = bInvert; }
+	//FORCEINLINE void SetBeatSpawnSide(EBeatSpawnSide Side) { BeatSide = Side; }
+	//FORCEINLINE EBeatSpawnSide GetBeatSpawnSide() { return BeatSide; }
+	//FORCEINLINE void SetBeatDirection(EBeatDirection Direction) { BeatDirection = Direction; }
+	//FORCEINLINE EBeatDirection GetBeatDirection() { return BeatDirection; }
+	//FORCEINLINE void StopMovement(bool bStop) { bStopMovement = bStop; }
 };

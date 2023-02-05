@@ -1,5 +1,9 @@
 #include "SaberPawn.h"
 #include "HandController.h"
+#include "PawnOverlay.h"
+#include "SaberGameMode.h"
+#include "Components/WidgetComponent.h"
+#include "SaberPlayerController.h"
 #include "Camera/CameraComponent.h"
 
 ASaberPawn::ASaberPawn()
@@ -12,6 +16,10 @@ ASaberPawn::ASaberPawn()
 	Camera = CreateDefaultSubobject<UCameraComponent>(FName("Camera"));
 	Camera->SetupAttachment(VRRoot);
 
+	WidgetComp = CreateDefaultSubobject<UWidgetComponent>(FName("WidgetComponent"));
+	WidgetComp->SetupAttachment(VRRoot);
+	WidgetComp->SetWidgetSpace(EWidgetSpace::World);
+	
 	if (LeftSaberMaterial)
 	{
 		LeftSaberMaterial = CreateDefaultSubobject<UMaterial>(TEXT("LeftSaberMaterial"));
@@ -25,7 +33,12 @@ ASaberPawn::ASaberPawn()
 void ASaberPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (WidgetComp)
+	{
+		PawnOverlay = Cast<UPawnOverlay>(WidgetComp->GetWidget());
+	}
+
 	LeftController = GetWorld()->SpawnActor<AHandController>(HandControllerClass);
 
 	if (LeftController)
@@ -68,5 +81,17 @@ void ASaberPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ASaberPawn::SetPlayerScore()
+{
+	ASaberGameMode* BeatSaberGameMode = GetWorld()->GetAuthGameMode<ASaberGameMode>();
+	
+	SaberController = SaberController == nullptr ? Cast<ASaberPlayerController>(GetController()) : SaberController;
+	
+	if (BeatSaberGameMode)
+	{
+		BeatSaberGameMode->PlayerUpdateScore(this, SaberController);
+	}
 }
 

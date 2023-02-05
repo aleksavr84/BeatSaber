@@ -1,5 +1,8 @@
 #include "Beat.h"
+#include "SaberPawn.h"
 #include "MotionControllerComponent.h"
+#include "SaberPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "ProceduralMeshComponent.h"
 
@@ -186,7 +189,7 @@ void ABeat::OnBeatOverlap_Implementation(FVector HitDirection, FVector Impulse)
 	//UE_LOG(LogTemp, Warning, TEXT("Doing some work here"));
 }
 
-void ABeat::CheckValidHit(EMovementDirection Direction, EControllerHand Hand)
+void ABeat::CheckValidHit(EMovementDirection Direction, EControllerHand Hand, ASaberPawn* PlayerPawn)
 {
 		// Checking Hands
 	if ((BeatSide == EBeatSpawnSide::EBS_Left && Hand == EControllerHand::Left)
@@ -224,19 +227,25 @@ void ABeat::CheckValidHit(EMovementDirection Direction, EControllerHand Hand)
 			default:
 				break;
 			}
+
 			bStopMovement = true;
 			
-			UE_LOG(LogTemp, Warning, TEXT("Valid Hit"));
+			if (PlayerPawn)
+			{
+				PlayerPawn->SetPlayerScore();
+			}
 		}
 		// Invalid Hit
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Invalid Hit"));
+			Destroy();
 		}
 	}
 	// Invalid Hit
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid Hit"));
+		Destroy();
 	}
 }

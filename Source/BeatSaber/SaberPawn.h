@@ -11,6 +11,12 @@ class BEATSABER_API ASaberPawn : public APawn
 
 public:
 	ASaberPawn();
+	
+	UPROPERTY(EditAnywhere)
+	class UWidgetComponent* WidgetComp;
+
+	UPROPERTY()
+	class UPawnOverlay* PawnOverlay;
 
 protected:
 	virtual void BeginPlay() override;
@@ -19,6 +25,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void SetPlayerScore();
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -44,4 +51,6 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	UMaterial* RightSaberMaterial;
+
+	class ASaberPlayerController* SaberController;
 };

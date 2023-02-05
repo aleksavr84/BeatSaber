@@ -45,7 +45,7 @@ private:
 
 	// References
 	class ABeat* Beat;
-	class APlayerPawn* SaberPawn;
+	class ASaberPawn* SaberPawn;
 	class APlayerController* SaberController;
 
 	// Helpers

@@ -1,6 +1,6 @@
 #include "HandController.h"
 #include "Beat.h"
-#include "GameFramework/Controller.h"
+#include "SaberPlayerController.h"
 #include "SaberPawn.h"
 #include "Haptics/HapticFeedbackEffect_Base.h"
 #include "Components/BoxComponent.h"
@@ -98,23 +98,25 @@ void AHandController::CalculateMovementDirection()
 
 void AHandController::SlicingTheBeat()
 {
+	SaberPawn = SaberPawn == nullptr ? Cast<ASaberPawn>(GetOwner()) : SaberPawn;
+
 	switch (MovementDirection)
 	{
 	case EMovementDirection::EMD_Left:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Left, MotionController->GetTrackingSource());
+		Beat->CheckValidHit(EMovementDirection::EMD_Left, MotionController->GetTrackingSource(), SaberPawn);
 		break;
 	case EMovementDirection::EMD_Right:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Right, MotionController->GetTrackingSource());
+		Beat->CheckValidHit(EMovementDirection::EMD_Right, MotionController->GetTrackingSource(), SaberPawn);
 		break;
 	case EMovementDirection::EMD_Up:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Up, MotionController->GetTrackingSource());
+		Beat->CheckValidHit(EMovementDirection::EMD_Up, MotionController->GetTrackingSource(), SaberPawn);
 		break;
 	case EMovementDirection::EMD_Down:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Down, MotionController->GetTrackingSource());
+		Beat->CheckValidHit(EMovementDirection::EMD_Down, MotionController->GetTrackingSource(), SaberPawn);
 		break;
 	default:
 		break;
@@ -123,7 +125,7 @@ void AHandController::SlicingTheBeat()
 
 void AHandController::HapticFeedback()
 {
-	SaberController = SaberController == nullptr ? Cast<APlayerController>(Cast<ASaberPawn>(GetOwner())->Controller) : SaberController;
+	SaberController = SaberController == nullptr ? Cast<ASaberPlayerController>(Cast<ASaberPawn>(GetOwner())->Controller) : SaberController;
 
 	if (SaberController && HapticEffect)
 	{

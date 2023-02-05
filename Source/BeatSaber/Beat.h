@@ -12,7 +12,7 @@ class BEATSABER_API ABeat : public AActor
 	
 public:	
 	ABeat();
-	void CheckValidHit(EMovementDirection Direction, EControllerHand Hand);
+	void CheckValidHit(EMovementDirection Direction, EControllerHand Hand, class ASaberPawn* PlayerPawn);
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,6 +39,9 @@ private:
 	UPROPERTY(EditAnywhere);
 	EBeatSpawnSide BeatSide = EBeatSpawnSide::EBS_Right;
 
+	UPROPERTY()
+	class ASaberPlayerController* SaberPlayerController;
+
 	void Init();
 	bool bIsInitialized;
 	bool bIsInverted;
@@ -61,9 +64,4 @@ private:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	FORCEINLINE void SetInverted(bool bInvert) { bIsInverted = bInvert; }
-	//FORCEINLINE void SetBeatSpawnSide(EBeatSpawnSide Side) { BeatSide = Side; }
-	//FORCEINLINE EBeatSpawnSide GetBeatSpawnSide() { return BeatSide; }
-	//FORCEINLINE void SetBeatDirection(EBeatDirection Direction) { BeatDirection = Direction; }
-	//FORCEINLINE EBeatDirection GetBeatDirection() { return BeatDirection; }
-	//FORCEINLINE void StopMovement(bool bStop) { bStopMovement = bStop; }
 };

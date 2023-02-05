@@ -12,7 +12,7 @@ class BEATSABER_API ABeat : public AActor
 	
 public:	
 	ABeat();
-	void CheckValidHit(EMovementDirection Direction, EHand Hand);
+	void CheckValidHit(EMovementDirection Direction, EControllerHand Hand);
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,9 +39,6 @@ private:
 	UPROPERTY(EditAnywhere);
 	EBeatSpawnSide BeatSide = EBeatSpawnSide::EBS_Right;
 
-	UPROPERTY(EditAnywhere);
-	EBeatDirection BeatDirection = EBeatDirection::EBD_Right;
-
 	void Init();
 	bool bIsInitialized;
 	bool bIsInverted;
@@ -49,7 +46,7 @@ private:
 	bool bIsRotated;
 	bool bStopMovement = false;
 	FRotator BeatRotation = FRotator(0, 0, 0);
-
+	EBeatDirection BeatDirection = EBeatDirection::EBD_Right;
 	void SetBeatMaterial();
 	void Move();
 	void SetBeatSide();

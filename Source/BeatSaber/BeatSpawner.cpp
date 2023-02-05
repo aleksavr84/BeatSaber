@@ -47,9 +47,9 @@ void ABeatSpawner::GenerateRandomSide()
     {
         // Spawning a double beat
         // Right
-        SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y + SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+        SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y + SpawnOffset, GetActorLocation().Z), bIsInvertedBeat);
         // Left
-        SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y - SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+        SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y - SpawnOffset, GetActorLocation().Z), bIsInvertedBeat);
     }
     else
     {
@@ -57,12 +57,12 @@ void ABeatSpawner::GenerateRandomSide()
         if (UKismetMathLibrary::RandomBool())
         {
             // Right
-            SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y + SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+            SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y + SpawnOffset, GetActorLocation().Z), bIsInvertedBeat);
         }
         else
         {
             // Left
-            SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y - SpawnOffset, GetActorLocation().Z), bIsInvertedBeat ? true : false);
+            SpawnBeat(FVector(GetActorLocation().X, GetActorLocation().Y - SpawnOffset, GetActorLocation().Z), bIsInvertedBeat);
         }
     }
   

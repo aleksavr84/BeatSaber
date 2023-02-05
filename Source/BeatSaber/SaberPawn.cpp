@@ -51,6 +51,11 @@ void ASaberPawn::BeginPlay()
 		RightController->SetHand(EControllerHand::Right);
 		RightController->SetOwner(this);
 	}
+
+	if (LeftController && RightController)
+	{
+		LeftController->PairController(RightController);
+	}
 }
 
 void ASaberPawn::Tick(float DeltaTime)

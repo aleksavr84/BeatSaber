@@ -1,4 +1,5 @@
 #include "Beat.h"
+#include "MotionControllerComponent.h"
 #include "TimerManager.h"
 #include "ProceduralMeshComponent.h"
 
@@ -90,7 +91,6 @@ void ABeat::SetBeatSide()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("Inverted Right -> Left"))
 			BeatSide = EBeatSpawnSide::EBS_Left;
 		}	
 	} 
@@ -101,8 +101,7 @@ void ABeat::SetBeatSide()
 			BeatSide = EBeatSpawnSide::EBS_Left;
 		}
 		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Inverted Left -> Right"))
+		{			
 			BeatSide = EBeatSpawnSide::EBS_Right;
 		}
 	}
@@ -115,18 +114,22 @@ void ABeat::GenerateRandomRotation()
 		// Right
 	case 0:
 		BeatRotation = FRotator(0, 0, 0);
+		BeatDirection = EBeatDirection::EBD_Right;
 		break;
 		// Up
 	case 1:
 		BeatRotation = FRotator(0, 0, -90);
+		BeatDirection = EBeatDirection::EBD_Top;
 		break;
 		// Left
 	case 2:
 		BeatRotation = FRotator(0, 0, -180);
+		BeatDirection = EBeatDirection::EBD_Left;
 		break;
 		// Down
 	case 3:
 		BeatRotation = FRotator(0, 0, -270);
+		BeatDirection = EBeatDirection::EBD_Down;
 		break;
 	}
 }
@@ -183,38 +186,53 @@ void ABeat::OnBeatOverlap_Implementation(FVector HitDirection, FVector Impulse)
 	//UE_LOG(LogTemp, Warning, TEXT("Doing some work here"));
 }
 
-void ABeat::CheckValidHit(EMovementDirection Direction, EHand Hand)
+void ABeat::CheckValidHit(EMovementDirection Direction, EControllerHand Hand)
 {
-	if ((BeatDirection == EBeatDirection::EBD_Right &&
-		Direction == EMovementDirection::EMD_Left
-		|| BeatDirection == EBeatDirection::EBD_Left &&
-		Direction == EMovementDirection::EMD_Right
-		|| BeatDirection == EBeatDirection::EBD_Down &&
-		Direction == EMovementDirection::EMD_Up
-		|| BeatDirection == EBeatDirection::EBD_Top &&
-		Direction == EMovementDirection::EMD_Down) &&
-		(BeatSide == EBeatSpawnSide::EBS_Left &&
-			Hand == EHand::ECH_Left)
-		|| (BeatSide == EBeatSpawnSide::EBS_Right &&
-			Hand == EHand::ECH_Right))
+		// Checking Hands
+	if ((BeatSide == EBeatSpawnSide::EBS_Left && Hand == EControllerHand::Left)
+		|| (BeatSide == EBeatSpawnSide::EBS_Right && Hand == EControllerHand::Right))
+
 	{
-		// Valid Hit
-		switch (Direction)
+		// Chacking Direction
+		if ((BeatDirection == EBeatDirection::EBD_Right &&
+			Direction == EMovementDirection::EMD_Left)
+			||
+			(BeatDirection == EBeatDirection::EBD_Left &&
+				Direction == EMovementDirection::EMD_Right)
+			||
+			(BeatDirection == EBeatDirection::EBD_Down &&
+				Direction == EMovementDirection::EMD_Up)
+			||
+			(BeatDirection == EBeatDirection::EBD_Top &&
+				Direction == EMovementDirection::EMD_Down))
 		{
-		case EMovementDirection::EMD_Left:
-			OnBeatOverlap(FVector(0, 0, 1), FVector(500, -500, 0));
-			break;
-		case EMovementDirection::EMD_Right:
-			OnBeatOverlap(FVector(0, 0, 1), FVector(500, 500, 0));
-			break;
-		case EMovementDirection::EMD_Up:
-			OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, -500));
-			break;
-		case EMovementDirection::EMD_Down:
-			OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, 500));
-			break;
+			// Valid Hit
+			switch (Direction)
+			{
+			case EMovementDirection::EMD_Left:
+				OnBeatOverlap(FVector(0, 0, 1), FVector(500, -500, 0));
+				break;
+			case EMovementDirection::EMD_Right:
+				OnBeatOverlap(FVector(0, 0, 1), FVector(500, 500, 0));
+				break;
+			case EMovementDirection::EMD_Up:
+				OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, -500));
+				break;
+			case EMovementDirection::EMD_Down:
+				OnBeatOverlap(FVector(0, 1, 0), FVector(500, 0, 500));
+				break;
+			default:
+				break;
+			}
+			bStopMovement = true;
+			
+			UE_LOG(LogTemp, Warning, TEXT("Valid Hit"));
 		}
-		bStopMovement = true;
+		// Invalid Hit
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Invalid Hit"));
+		}
 	}
 	// Invalid Hit
 	else

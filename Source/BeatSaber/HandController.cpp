@@ -49,6 +49,12 @@ void AHandController::SetSabreMeshMaterial(UMaterial* Material)
 	SaberMesh->SetMaterial(0, Material);
 }
 
+void AHandController::PairController(AHandController* Controller)
+{
+	OtherController = Controller;
+	OtherController->OtherController = this;
+}
+
 void AHandController::CalculateMovementDirection()
 {
 	FVector MovementDelta = UKismetMathLibrary::GetDirectionUnitVector(StartLocation, GetActorLocation());
@@ -96,19 +102,21 @@ void AHandController::SlicingTheBeat()
 	{
 	case EMovementDirection::EMD_Left:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Left, GetHand());
+		Beat->CheckValidHit(EMovementDirection::EMD_Left, MotionController->GetTrackingSource());
 		break;
 	case EMovementDirection::EMD_Right:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Right, GetHand());
+		Beat->CheckValidHit(EMovementDirection::EMD_Right, MotionController->GetTrackingSource());
 		break;
 	case EMovementDirection::EMD_Up:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Up, GetHand());
+		Beat->CheckValidHit(EMovementDirection::EMD_Up, MotionController->GetTrackingSource());
 		break;
 	case EMovementDirection::EMD_Down:
 		HapticFeedback();
-		Beat->CheckValidHit(EMovementDirection::EMD_Down, GetHand());
+		Beat->CheckValidHit(EMovementDirection::EMD_Down, MotionController->GetTrackingSource());
+		break;
+	default:
 		break;
 	}
 }
@@ -138,8 +146,10 @@ EHand AHandController::GetHand()
 	case EControllerHand::Right:
 		return EHand::ECH_Right;
 		break;
+	default:
+		return EHand::ECH_MAX;
+		break;
 	}
-	return EHand::ECH_Right;
 }
 
 void AHandController::ActorBeginOverlap(AActor* OverlappedActor, AActor* OtherActor)

@@ -29,7 +29,7 @@ private:
 	int32 TotalBeatsToSpawn = 30;
 
 	UPROPERTY(EditAnywhere)
-	double SpawnOffset = 100;
+	double SpawnOffset = 50;
 
 	void GenerateBeat();
 	void GenerateRandomSide();

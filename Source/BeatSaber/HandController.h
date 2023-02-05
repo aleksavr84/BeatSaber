@@ -58,11 +58,13 @@ private:
 	FVector StartLocation;
 	bool bBeatOverlapped;
 	bool bCalculated;
-	float MinOffsetY = 0.25;
-	float MinOffsetZ = 0.25;
+	float MinOffsetY = 0.5;
+	float MinOffsetZ = 0.5;
 	EMovementDirection MovementDirection;
+
+	AHandController* OtherController;
 
 public:
 	void SetHand(EControllerHand Hand) { MotionController->SetTrackingSource(Hand); }
-	
+	void PairController(AHandController* Controller);
 };

@@ -23,7 +23,10 @@ private:
 	TSubclassOf<class ABeat> BeatClass;
 
 	UPROPERTY(EditAnywhere)
-	float BeatTime = 1.25f;
+	class USoundCue* Music;
+
+	UPROPERTY(EditAnywhere)
+	float BeatTime = 2.f;
 
 	UPROPERTY(EditAnywhere)
 	int32 TotalBeatsToSpawn = 30;
@@ -31,10 +34,12 @@ private:
 	UPROPERTY(EditAnywhere)
 	double SpawnOffset = 50;
 
+	void PlayMusic();
 	void GenerateBeat();
 	void GenerateRandomSide();
 	void SpawnBeat(FVector Location, bool bInvert);
 	FVector BeatSpawnLocation;
+	bool bIsFirstBeat = true;
 	bool bIsBeat;
 	bool bIsDoubleBeat;
 	bool bIsInvertedBeat;

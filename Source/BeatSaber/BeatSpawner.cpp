@@ -2,6 +2,9 @@
 #include "TimerManager.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Beat.h"
+#include "Sound/SoundCue.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ABeatSpawner::ABeatSpawner()
 {
@@ -19,6 +22,24 @@ void ABeatSpawner::BeginPlay()
 void ABeatSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ABeatSpawner::PlayMusic()
+{
+    if (Music)
+    {
+        UGameplayStatics::SpawnSoundAttached(
+            Music,
+            GetRootComponent(),
+            FName(),
+            GetActorLocation(),
+            EAttachLocation::KeepWorldPosition,
+            false,
+            1.f,
+            1.f,
+            1.f            
+        );
+    }
 }
 
 void ABeatSpawner::GenerateBeat()
@@ -39,7 +60,13 @@ void ABeatSpawner::GenerateBeat()
 }
 
 void ABeatSpawner::GenerateRandomSide()
-{
+{ 
+    if (bIsFirstBeat)
+    {
+        PlayMusic();
+        bIsFirstBeat = false;
+    }
+    
     bIsDoubleBeat = UKismetMathLibrary::RandomBool();
     bIsInvertedBeat = UKismetMathLibrary::RandomBool();
 
